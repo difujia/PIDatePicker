@@ -96,18 +96,18 @@ public class PIDatePicker: UIControl, UIPickerViewDataSource, UIPickerViewDelega
     */
     func commonInit() {
         self.translatesAutoresizingMaskIntoConstraints = false
+        clipsToBounds = true
 
+        self.pickerView.translatesAutoresizingMaskIntoConstraints = false
         self.pickerView.dataSource = self
         self.pickerView.delegate = self
         
         self.addSubview(self.pickerView)
-        
-        let topConstraint = NSLayoutConstraint(item: self.pickerView, attribute: .Top, relatedBy: .Equal, toItem: self, attribute: .Top, multiplier: 1, constant: 0)
-        let bottomConstraint = NSLayoutConstraint(item: self.pickerView, attribute: .Bottom, relatedBy: .Equal, toItem: self, attribute: .Bottom, multiplier: 1, constant: 0)
-        let leftConstraint = NSLayoutConstraint(item: self.pickerView, attribute: .Leading, relatedBy: .Equal, toItem: self, attribute: .Leading, multiplier: 1, constant: 0)
-        let rightConstraint = NSLayoutConstraint(item: self.pickerView, attribute: .Trailing, relatedBy: .Equal, toItem: self, attribute: .Trailing, multiplier: 1, constant: 0)
-        
-        self.addConstraints([topConstraint, bottomConstraint, leftConstraint, rightConstraint])
+
+        let centerXConstraint = NSLayoutConstraint(item: self.pickerView, attribute: .CenterX, relatedBy: .Equal, toItem: self, attribute: .CenterX, multiplier: 1, constant: 0)
+        let centerYConstraint = NSLayoutConstraint(item: self.pickerView, attribute: .CenterY, relatedBy: .Equal, toItem: self, attribute: .CenterY, multiplier: 1, constant: 0)
+
+        self.addConstraints([centerXConstraint, centerYConstraint])
     }
     
     // MARK: -
