@@ -162,39 +162,44 @@ public class PIDatePicker: UIControl, UIPickerViewDataSource, UIPickerViewDelega
     
         :returns: A new instance of NSDateFormatter
     */
-    private func dateFormatter() -> NSDateFormatter {
+    lazy private var dateFormatter: NSDateFormatter = {
         let dateFormatter = NSDateFormatter()
         dateFormatter.calendar = self.calendar
         dateFormatter.locale = self.locale
         
         return dateFormatter
-    }
+    }()
+
+    lazy private var yearFormatter: NSDateFormatter = {
+        let formatter = NSDateFormatter()
+        formatter.dateFormat = NSDateFormatter.dateFormatFromTemplate("yy", options: 0, locale: self.locale)
+        return formatter
+    }()
+
+    lazy private var monthFormatter: NSDateFormatter = {
+        let formatter = NSDateFormatter()
+        formatter.dateFormat = NSDateFormatter.dateFormatFromTemplate("MM", options: 0, locale: self.locale)
+        return formatter
+    }()
+
+    lazy private var dayFormatter: NSDateFormatter = {
+        let formatter = NSDateFormatter()
+        formatter.dateFormat = NSDateFormatter.dateFormatFromTemplate("d", options: 0, locale: self.locale)
+        return formatter
+    }()
 
     /**
         Refreshes the ordering of components based on the current locale. Calling this function will not refresh the picker view.
     */
     private func refreshComponentOrdering() {
-        var componentOrdering = NSDateFormatter.dateFormatFromTemplate("yMMMMd", options: 0, locale: self.locale)!
+        let componentOrdering = NSDateFormatter.dateFormatFromTemplate("yMMMMd", options: 0, locale: self.locale)!
 
-        let firstComponentOrderingString = componentOrdering[componentOrdering.startIndex.advancedBy(0)]
-        let lastComponentOrderingString = componentOrdering[componentOrdering.startIndex.advancedBy(componentOrdering.characters.count - 1)]
+        let orderingCharacters = componentOrdering.characters
+        let ordering = [PIDatePickerComponents.Year, PIDatePickerComponents.Month, PIDatePickerComponents.Day].sort {
+            orderingCharacters.indexOf($0.rawValue)! < orderingCharacters.indexOf($1.rawValue)!
+        }
 
-        let characterSet = NSMutableCharacterSet()
-        
-        characterSet.formUnionWithCharacterSet(NSCharacterSet(charactersInString: String(firstComponentOrderingString) +
-            String(lastComponentOrderingString)))
-        characterSet.formUnionWithCharacterSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
-        characterSet.formUnionWithCharacterSet(NSCharacterSet.punctuationCharacterSet())
-        
-        componentOrdering = componentOrdering.stringByTrimmingCharactersInSet(characterSet)
-
-        let remainingValue = componentOrdering[componentOrdering.startIndex.advancedBy(0)]
-
-        let firstComponent = PIDatePickerComponents(rawValue: firstComponentOrderingString)!
-        let secondComponent = PIDatePickerComponents(rawValue: remainingValue)!
-        let lastComponent = PIDatePickerComponents(rawValue: lastComponentOrderingString)!
-
-        self.datePickerComponentOrdering = [firstComponent, secondComponent, lastComponent]
+        datePickerComponentOrdering = ordering
     }
     
     /**
@@ -221,7 +226,6 @@ public class PIDatePicker: UIControl, UIPickerViewDataSource, UIPickerViewDelega
         let value = self.rawValueForRow(row, inComponent: dateComponent)
 
         if dateComponent == PIDatePickerComponents.Month {
-            let dateFormatter = self.dateFormatter()
             return dateFormatter.monthSymbols[value - 1]
         } else {
             return String(value)
