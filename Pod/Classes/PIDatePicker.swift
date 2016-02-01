@@ -514,39 +514,14 @@ public class PIDatePicker: UIControl, UIPickerViewDataSource, UIPickerViewDelega
         label.font = self.font
         label.textColor = self.textColor
         label.text = self.titleForRow(row, inComponentIndex: component)
-        label.textAlignment = self.componentAtIndex(component) == .Month ? NSTextAlignment.Left : NSTextAlignment.Right
+        label.textAlignment = .Center
         label.textColor = self.isRowEnabled(row, forComponent: self.componentAtIndex(component)) ? self.textColor : self.disabledTextColor
 
         return label
     }
 
     public func pickerView(pickerView: UIPickerView, widthForComponent component: Int) -> CGFloat {
-        let widthBuffer = 25.0
-        
-        let calendarComponent = self.componentAtIndex(component)
-        let stringSizingAttributes = [NSFontAttributeName : self.font]
-        var size = 0.01
-        
-        if calendarComponent == .Month {
-            let dateFormatter = self.dateFormatter()
-            
-            // Get the length of the longest month string and set the size to it.
-            for symbol in dateFormatter.monthSymbols as [String] {
-                let monthSize = NSString(string: symbol).sizeWithAttributes(stringSizingAttributes)
-                size = max(size, Double(monthSize.width))
-            }
-        } else if calendarComponent == .Day{
-            // Pad the day string to two digits
-            let dayComponentSizingString = NSString(string: "00")
-            size = Double(dayComponentSizingString.sizeWithAttributes(stringSizingAttributes).width)
-        } else if calendarComponent == .Year  {
-            // Pad the year string to four digits.
-            let yearComponentSizingString = NSString(string: "00")
-            size = Double(yearComponentSizingString.sizeWithAttributes(stringSizingAttributes).width)
-        }
-        
-        // Add the width buffer in order to allow the picker components not to run up against the edges
-        return CGFloat(size + widthBuffer)
+        return pickerView.bounds.width / 3
     }
 
 
