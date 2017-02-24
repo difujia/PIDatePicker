@@ -8,62 +8,62 @@
 
 import UIKit
 
-public class PIDatePicker: UIControl, UIPickerViewDataSource, UIPickerViewDelegate {
+open class PIDatePicker: UIControl, UIPickerViewDataSource, UIPickerViewDelegate {
 
     // MARK: -
     // MARK: Public Properties
-    public var delegate: PIDatePickerDelegate?
+    open var delegate: PIDatePickerDelegate?
     
     /// The font for the date picker.
-    public var font = UIFont.systemFontOfSize(15.0)
+    open var font = UIFont.systemFont(ofSize: 15.0)
 
     /// The text color for the date picker components.
-    public var textColor = UIColor.blackColor()
+    open var textColor = UIColor.black
 
     /// The minimum date to show for the date picker. Set to NSDate.distantPast() by default
-    public var minimumDate = NSDate.distantPast() {
+    open var minimumDate = Date.distantPast {
         didSet {
             self.validateMinimumAndMaximumDate()
         }
     }
 
     /// The maximum date to show for the date picker. Set to NSDate.distantFuture() by default
-    public var maximumDate = NSDate.distantFuture() {
+    open var maximumDate = Date.distantFuture {
         didSet {
             self.validateMinimumAndMaximumDate()
         }
     }
 
      /// The current locale to use for formatting the date picker. By default, set to the device's current locale
-    public var locale : NSLocale = NSLocale.currentLocale() {
+    open var locale : Locale = Locale.current {
         didSet {
             self.calendar.locale = self.locale
         }
     }
 
     /// The current date value of the date picker.
-    public private(set) var date = NSDate()
+    open fileprivate(set) var date = Date()
 
     // MARK: -
     // MARK: Private Variables
     
-    private let maximumNumberOfRows = Int(INT16_MAX)
+    fileprivate let maximumNumberOfRows = Int(INT16_MAX)
     
      /// The internal picker view used for laying out the date components.
-    private let pickerView = UIPickerView()
+    fileprivate let pickerView = UIPickerView()
 
      /// The calendar used for formatting dates.
-    private var calendar = NSCalendar(calendarIdentifier: NSCalendarIdentifierGregorian)!
+    fileprivate var calendar = Calendar(identifier: Calendar.Identifier.gregorian)
 
      /// Calculates the current calendar components for the current date.
-    private var currentCalendarComponents : NSDateComponents {
+    fileprivate var currentCalendarComponents : DateComponents {
         get {
-            return self.calendar.components([.Year, .Month, .Day], fromDate: self.date)
+            return (self.calendar as NSCalendar).components([.year, .month, .day], from: self.date)
         }
     }
     
      /// Gets the text color to be used for the label in a disabled state
-    private var disabledTextColor : UIColor {
+    fileprivate var disabledTextColor : UIColor {
         get {
             var r : CGFloat = 0
             var g : CGFloat = 0
@@ -76,7 +76,7 @@ public class PIDatePicker: UIControl, UIPickerViewDataSource, UIPickerViewDelega
     }
 
      /// The order in which each component should be ordered in.
-    private var datePickerComponentOrdering = [PIDatePickerComponents]()
+    fileprivate var datePickerComponentOrdering = [PIDatePickerComponents]()
 
     // MARK: -
     // MARK: LifeCycle
@@ -104,20 +104,20 @@ public class PIDatePicker: UIControl, UIPickerViewDataSource, UIPickerViewDelega
         
         self.addSubview(self.pickerView)
 
-        let centerXConstraint = NSLayoutConstraint(item: self.pickerView, attribute: .CenterX, relatedBy: .Equal, toItem: self, attribute: .CenterX, multiplier: 1, constant: 0)
-        let centerYConstraint = NSLayoutConstraint(item: self.pickerView, attribute: .CenterY, relatedBy: .Equal, toItem: self, attribute: .CenterY, multiplier: 1, constant: 0)
+        let centerXConstraint = NSLayoutConstraint(item: self.pickerView, attribute: .centerX, relatedBy: .equal, toItem: self, attribute: .centerX, multiplier: 1, constant: 0)
+        let centerYConstraint = NSLayoutConstraint(item: self.pickerView, attribute: .centerY, relatedBy: .equal, toItem: self, attribute: .centerY, multiplier: 1, constant: 0)
 
         self.addConstraints([centerXConstraint, centerYConstraint])
     }
     
     // MARK: -
     // MARK: Override
-    public override func intrinsicContentSize() -> CGSize {
-        return self.pickerView.intrinsicContentSize()
+    open override var intrinsicContentSize : CGSize {
+        return self.pickerView.intrinsicContentSize
     }
     
-    public override func willMoveToSuperview(newSuperview: UIView?) {
-        super.willMoveToSuperview(newSuperview)
+    open override func willMove(toSuperview newSuperview: UIView?) {
+        super.willMove(toSuperview: newSuperview)
         self.reloadAllComponents()
         
         self.setDate(self.date)
@@ -129,7 +129,7 @@ public class PIDatePicker: UIControl, UIPickerViewDataSource, UIPickerViewDelega
     /**
         Reloads all of the components in the date picker.
     */
-    public func reloadAllComponents() {
+    open func reloadAllComponents() {
         self.refreshComponentOrdering()
         self.pickerView.reloadAllComponents()
     }
@@ -140,7 +140,7 @@ public class PIDatePicker: UIControl, UIPickerViewDataSource, UIPickerViewDelega
     :param: date     The date to set the picker to.
     :param: animated True if the date picker should changed with an animation; otherwise false,
     */
-    public func setDate(date : NSDate, animated : Bool) {
+    open func setDate(_ date : Date, animated : Bool) {
         self.date = date
         self.updatePickerViewComponentValuesAnimated(animated)
     }
@@ -153,7 +153,7 @@ public class PIDatePicker: UIControl, UIPickerViewDataSource, UIPickerViewDelega
     
     :param: date The date to be set.
     */
-    private func setDate(date : NSDate) {
+    fileprivate func setDate(_ date : Date) {
         self.setDate(date, animated: false)
     }
 
@@ -162,41 +162,41 @@ public class PIDatePicker: UIControl, UIPickerViewDataSource, UIPickerViewDelega
     
         :returns: A new instance of NSDateFormatter
     */
-    lazy private var dateFormatter: NSDateFormatter = {
-        let dateFormatter = NSDateFormatter()
+    lazy fileprivate var dateFormatter: DateFormatter = {
+        let dateFormatter = DateFormatter()
         dateFormatter.calendar = self.calendar
         dateFormatter.locale = self.locale
         
         return dateFormatter
     }()
 
-    lazy private var yearFormatter: NSDateFormatter = {
-        let formatter = NSDateFormatter()
-        formatter.dateFormat = NSDateFormatter.dateFormatFromTemplate("yy", options: 0, locale: self.locale)
+    lazy fileprivate var yearFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = DateFormatter.dateFormat(fromTemplate: "yy", options: 0, locale: self.locale)
         return formatter
     }()
 
-    lazy private var monthFormatter: NSDateFormatter = {
-        let formatter = NSDateFormatter()
-        formatter.dateFormat = NSDateFormatter.dateFormatFromTemplate("MM", options: 0, locale: self.locale)
+    lazy fileprivate var monthFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = DateFormatter.dateFormat(fromTemplate: "MM", options: 0, locale: self.locale)
         return formatter
     }()
 
-    lazy private var dayFormatter: NSDateFormatter = {
-        let formatter = NSDateFormatter()
-        formatter.dateFormat = NSDateFormatter.dateFormatFromTemplate("d", options: 0, locale: self.locale)
+    lazy fileprivate var dayFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = DateFormatter.dateFormat(fromTemplate: "d", options: 0, locale: self.locale)
         return formatter
     }()
 
     /**
         Refreshes the ordering of components based on the current locale. Calling this function will not refresh the picker view.
     */
-    private func refreshComponentOrdering() {
-        let componentOrdering = NSDateFormatter.dateFormatFromTemplate("yMMMMd", options: 0, locale: self.locale)!
+    fileprivate func refreshComponentOrdering() {
+        let componentOrdering = DateFormatter.dateFormat(fromTemplate: "yMMMMd", options: 0, locale: self.locale)!
 
         let orderingCharacters = componentOrdering.characters
-        let ordering = [PIDatePickerComponents.Year, PIDatePickerComponents.Month, PIDatePickerComponents.Day].sort {
-            orderingCharacters.indexOf($0.rawValue)! < orderingCharacters.indexOf($1.rawValue)!
+        let ordering = [PIDatePickerComponents.year, PIDatePickerComponents.month, PIDatePickerComponents.day].sorted {
+            orderingCharacters.index(of: $0.rawValue)! < orderingCharacters.index(of: $1.rawValue)!
         }
 
         datePickerComponentOrdering = ordering
@@ -205,9 +205,9 @@ public class PIDatePicker: UIControl, UIPickerViewDataSource, UIPickerViewDelega
     /**
     Validates that the set minimum and maximum dates are valid.
     */
-    private func validateMinimumAndMaximumDate() {
+    fileprivate func validateMinimumAndMaximumDate() {
         let ordering = self.minimumDate.compare(self.maximumDate)
-        if (ordering != .OrderedAscending ){
+        if (ordering != .orderedAscending ){
             fatalError("Cannot set a maximum date that is equal or less than the minimum date.")
         }
     }
@@ -220,12 +220,12 @@ public class PIDatePicker: UIControl, UIPickerViewDataSource, UIPickerViewDelega
     
     :returns: A string containing the value of the current row at the component index.
     */
-    private func titleForRow(row : Int, inComponentIndex componentIndex: Int) -> String {
+    fileprivate func titleForRow(_ row : Int, inComponentIndex componentIndex: Int) -> String {
         let dateComponent = self.componentAtIndex(componentIndex)
 
         let value = self.rawValueForRow(row, inComponent: dateComponent)
 
-        if dateComponent == PIDatePickerComponents.Month {
+        if dateComponent == PIDatePickerComponents.month {
             return dateFormatter.monthSymbols[value - 1]
         } else {
             return String(value)
@@ -239,13 +239,13 @@ public class PIDatePicker: UIControl, UIPickerViewDataSource, UIPickerViewDelega
     
     :returns: The value of the component.
     */
-    private func valueForDateComponent(component : PIDatePickerComponents) -> Int{
-        if component == .Year {
-            return self.currentCalendarComponents.year
-        } else if component == .Day {
-            return self.currentCalendarComponents.day
+    fileprivate func valueForDateComponent(_ component : PIDatePickerComponents) -> Int{
+        if component == .year {
+            return self.currentCalendarComponents.year!
+        } else if component == .day {
+            return self.currentCalendarComponents.day!
         } else {
-            return self.currentCalendarComponents.month
+            return self.currentCalendarComponents.month!
         }
     }
     
@@ -256,17 +256,17 @@ public class PIDatePicker: UIControl, UIPickerViewDataSource, UIPickerViewDelega
     
     :returns: The maximum date range for that component.
     */
-    private func maximumRangeForComponent(component : PIDatePickerComponents) -> NSRange {
-        var calendarUnit : NSCalendarUnit
-        if component == .Year {
-            calendarUnit = .Year
-        } else if component == .Day {
-            calendarUnit = .Day
+    fileprivate func maximumRangeForComponent(_ component : PIDatePickerComponents) -> NSRange {
+        var calendarUnit : NSCalendar.Unit
+        if component == .year {
+            calendarUnit = .year
+        } else if component == .day {
+            calendarUnit = .day
         } else {
-            calendarUnit = .Month
+            calendarUnit = .month
         }
         
-        return self.calendar.maximumRangeOfUnit(calendarUnit)
+        return (self.calendar as NSCalendar).maximumRange(of: calendarUnit)
     }
     
     /**
@@ -277,7 +277,7 @@ public class PIDatePicker: UIControl, UIPickerViewDataSource, UIPickerViewDelega
     
     :returns: The raw value of the row, in integer. Use NSDateComponents to convert to a usable date object.
     */
-    private func rawValueForRow(row : Int, inComponent component : PIDatePickerComponents) -> Int {
+    fileprivate func rawValueForRow(_ row : Int, inComponent component : PIDatePickerComponents) -> Int {
         let calendarUnitRange = self.maximumRangeForComponent(component)
         return calendarUnitRange.location + (row % calendarUnitRange.length)
     }
@@ -290,24 +290,24 @@ public class PIDatePicker: UIControl, UIPickerViewDataSource, UIPickerViewDelega
     
     :returns: YES if the row should be enabled; otherwise NO.
     */
-    private func isRowEnabled(row: Int, forComponent component : PIDatePickerComponents) -> Bool {
+    fileprivate func isRowEnabled(_ row: Int, forComponent component : PIDatePickerComponents) -> Bool {
         
         let rawValue = self.rawValueForRow(row, inComponent: component)
         
-        let components = NSDateComponents()
+        var components = DateComponents()
         components.year = self.currentCalendarComponents.year
         components.month = self.currentCalendarComponents.month
         components.day = self.currentCalendarComponents.day
         
-        if component == .Year {
+        if component == .year {
             components.year = rawValue
-        } else if component == .Day {
+        } else if component == .day {
             components.day = rawValue
-        } else if component == .Month {
+        } else if component == .month {
             components.month = rawValue
         }
         
-        let dateForRow = self.calendar.dateFromComponents(components)!
+        let dateForRow = self.calendar.date(from: components)!
         
         return self.dateIsInRange(dateForRow)
     }
@@ -319,9 +319,9 @@ public class PIDatePicker: UIControl, UIPickerViewDataSource, UIPickerViewDelega
     
     :returns: True if the input date is within range of the minimum and maximum; otherwise false.
     */
-    private func dateIsInRange(date : NSDate) -> Bool {
-        return self.minimumDate.compare(date) != NSComparisonResult.OrderedDescending &&
-            self.maximumDate.compare(date) != NSComparisonResult.OrderedAscending
+    fileprivate func dateIsInRange(_ date : Date) -> Bool {
+        return self.minimumDate.compare(date) != ComparisonResult.orderedDescending &&
+            self.maximumDate.compare(date) != ComparisonResult.orderedAscending
     }
     
     /**
@@ -329,8 +329,8 @@ public class PIDatePicker: UIControl, UIPickerViewDataSource, UIPickerViewDelega
     
     :param: animated True if the update should be animated; otherwise false.
     */
-    private func updatePickerViewComponentValuesAnimated(animated : Bool) {
-        for (_, dateComponent) in self.datePickerComponentOrdering.enumerate() {
+    fileprivate func updatePickerViewComponentValuesAnimated(_ animated : Bool) {
+        for (_, dateComponent) in self.datePickerComponentOrdering.enumerated() {
             self.setIndexOfComponent(dateComponent, animated: animated)
         }
     }
@@ -341,7 +341,7 @@ public class PIDatePicker: UIControl, UIPickerViewDataSource, UIPickerViewDelega
     :param: component The component to be updated.
     :param: animated  True if the update should be animated; otherwise false.
     */
-    private func setIndexOfComponent(component : PIDatePickerComponents, animated: Bool) {
+    fileprivate func setIndexOfComponent(_ component : PIDatePickerComponents, animated: Bool) {
         self.setIndexOfComponent(component, toValue: self.valueForDateComponent(component), animated: animated)
     }
     
@@ -352,7 +352,7 @@ public class PIDatePicker: UIControl, UIPickerViewDataSource, UIPickerViewDelega
     :param: value     The value the component should be updated ot.
     :param: animated  True if the update should be animated; otherwise false.
     */
-    private func setIndexOfComponent(component : PIDatePickerComponents, toValue value : Int, animated: Bool) {
+    fileprivate func setIndexOfComponent(_ component : PIDatePickerComponents, toValue value : Int, animated: Bool) {
         let componentRange = self.maximumRangeForComponent(component)
         
         let idx = (value - componentRange.location)
@@ -360,7 +360,7 @@ public class PIDatePicker: UIControl, UIPickerViewDataSource, UIPickerViewDelega
         
         var componentIndex = 0
         
-        for (index, dateComponent) in self.datePickerComponentOrdering.enumerate() {
+        for (index, dateComponent) in self.datePickerComponentOrdering.enumerated() {
             if (dateComponent == component) {
                 componentIndex = index
             }
@@ -376,7 +376,7 @@ public class PIDatePicker: UIControl, UIPickerViewDataSource, UIPickerViewDelega
     
     :returns: The date picker component type at the index.
     */
-    private func componentAtIndex(index: Int) -> PIDatePickerComponents {
+    fileprivate func componentAtIndex(_ index: Int) -> PIDatePickerComponents {
         return self.datePickerComponentOrdering[index]
     }
     
@@ -388,13 +388,13 @@ public class PIDatePicker: UIControl, UIPickerViewDataSource, UIPickerViewDelega
     
     :returns: The number of days in the month.
     */
-    private func numberOfDaysForMonth(month : Int, inYear year : Int) -> Int {
-        let components = NSDateComponents()
+    fileprivate func numberOfDaysForMonth(_ month : Int, inYear year : Int) -> Int {
+        var components = DateComponents()
         components.month = month
         components.day = 1
         components.year = year
         
-        let calendarRange = self.calendar.rangeOfUnit(.Day, inUnit: .Month, forDate: self.calendar.dateFromComponents(components)!)
+        let calendarRange = (self.calendar as NSCalendar).range(of: .day, in: .month, for: self.calendar.date(from: components)!)
         let numberOfDaysInMonth = calendarRange.length
         
         return numberOfDaysInMonth
@@ -408,16 +408,16 @@ public class PIDatePicker: UIControl, UIPickerViewDataSource, UIPickerViewDelega
     
     :returns: True if updating the component to the specified value would result in a valid date; otherwise false.
     */
-    private func isValidValue(value : Int, forComponent component: PIDatePickerComponents) -> Bool {
-        if (component == .Year) {
-            let numberOfDaysInMonth = self.numberOfDaysForMonth(self.currentCalendarComponents.month, inYear: value)
-            return self.currentCalendarComponents.day <= numberOfDaysInMonth
-        } else if (component == .Day) {
-            let numberOfDaysInMonth = self.numberOfDaysForMonth(self.currentCalendarComponents.month, inYear: self.currentCalendarComponents.year)
+    fileprivate func isValidValue(_ value : Int, forComponent component: PIDatePickerComponents) -> Bool {
+        if (component == .year) {
+            let numberOfDaysInMonth = self.numberOfDaysForMonth(self.currentCalendarComponents.month!, inYear: value)
+            return self.currentCalendarComponents.day! <= numberOfDaysInMonth
+        } else if (component == .day) {
+            let numberOfDaysInMonth = self.numberOfDaysForMonth(self.currentCalendarComponents.month!, inYear: self.currentCalendarComponents.year!)
             return value <= numberOfDaysInMonth
-        } else if (component == .Month) {
-            let numberOfDaysInMonth = self.numberOfDaysForMonth(value, inYear: self.currentCalendarComponents.year)
-            return self.currentCalendarComponents.day <= numberOfDaysInMonth
+        } else if (component == .month) {
+            let numberOfDaysInMonth = self.numberOfDaysForMonth(value, inYear: self.currentCalendarComponents.year!)
+            return self.currentCalendarComponents.day! <= numberOfDaysInMonth
         }
         
         return true
@@ -431,12 +431,12 @@ public class PIDatePicker: UIControl, UIPickerViewDataSource, UIPickerViewDelega
     
     :returns: The components by updating the current date's components to the specified value.
     */
-    private func currentCalendarComponentsByUpdatingComponent(component : PIDatePickerComponents, toValue value : Int) -> NSDateComponents {
-        let components = self.currentCalendarComponents
+    fileprivate func currentCalendarComponentsByUpdatingComponent(_ component : PIDatePickerComponents, toValue value : Int) -> DateComponents {
+        var components = self.currentCalendarComponents
         
-        if (component == .Month) {
+        if (component == .month) {
             components.month = value
-        } else if (component == .Day) {
+        } else if (component == .day) {
             components.day = value
         } else {
             components.year = value
@@ -453,16 +453,16 @@ public class PIDatePicker: UIControl, UIPickerViewDataSource, UIPickerViewDelega
     
     :returns: The components by updating the specified value; the components will be a valid date object.
     */
-    private func validDateValueByUpdatingComponent(component : PIDatePickerComponents, toValue value : Int) -> NSDateComponents {
-        let components = self.currentCalendarComponentsByUpdatingComponent(component, toValue: value)
+    fileprivate func validDateValueByUpdatingComponent(_ component : PIDatePickerComponents, toValue value : Int) -> DateComponents {
+        var components = self.currentCalendarComponentsByUpdatingComponent(component, toValue: value)
         
         if (!self.isValidValue(value, forComponent: component)) {
-            if (component == .Month) {
-                components.day = self.numberOfDaysForMonth(value, inYear: components.year)
-            } else if (component == .Day) {
-                components.day = self.numberOfDaysForMonth(components.month, inYear:components.year)
+            if (component == .month) {
+                components.day = self.numberOfDaysForMonth(value, inYear: components.year!)
+            } else if (component == .day) {
+                components.day = self.numberOfDaysForMonth(components.month!, inYear:components.year!)
             } else {
-                components.day = self.numberOfDaysForMonth(components.month, inYear: value)
+                components.day = self.numberOfDaysForMonth(components.month!, inYear: value)
             }
         }
         
@@ -473,7 +473,7 @@ public class PIDatePicker: UIControl, UIPickerViewDataSource, UIPickerViewDelega
     // MARK: Protocols
     // MARK: UIPickerViewDelegate
     
-    public func pickerView(pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+    open func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         let datePickerComponent = self.componentAtIndex(component)
         let value = self.rawValueForRow(row, inComponent: datePickerComponent)
         
@@ -481,7 +481,7 @@ public class PIDatePicker: UIControl, UIPickerViewDataSource, UIPickerViewDelega
         let components = self.validDateValueByUpdatingComponent(datePickerComponent, toValue: value)
         
         // If the resulting components are not in the date range ...
-        if (!self.dateIsInRange(self.calendar.dateFromComponents(components)!)) {
+        if (!self.dateIsInRange(self.calendar.date(from: components)!)) {
             // ... go back to original date
             self.setDate(self.date, animated: true)
         } else {
@@ -490,47 +490,47 @@ public class PIDatePicker: UIControl, UIPickerViewDataSource, UIPickerViewDelega
             
             if (rawComponents.day != components.day) {
                 // Only animate the change if the day value is not a valid date.
-                self.setIndexOfComponent(.Day, toValue: components.day, animated: self.isValidValue(components.day, forComponent: .Day))
+                self.setIndexOfComponent(.day, toValue: components.day!, animated: self.isValidValue(components.day!, forComponent: .day))
             }
             
             if (rawComponents.month != components.month) {
-                self.setIndexOfComponent(.Month, toValue: components.day, animated: datePickerComponent != .Month)
+                self.setIndexOfComponent(.month, toValue: components.day!, animated: datePickerComponent != .month)
             }
             
             if (rawComponents.year != components.year) {
-                self.setIndexOfComponent(.Year, toValue: components.day, animated: datePickerComponent != .Year)
+                self.setIndexOfComponent(.year, toValue: components.day!, animated: datePickerComponent != .year)
             }
             
-            self.date = self.calendar.dateFromComponents(components)!
-            self.sendActionsForControlEvents(.ValueChanged)
+            self.date = self.calendar.date(from: components)!
+            self.sendActions(for: .valueChanged)
         }
         
         self.delegate?.pickerView(self, didSelectRow: row, inComponent: component)
     }
 
-    public func pickerView(pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusingView view: UIView?) -> UIView {
+    open func pickerView(_ pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusing view: UIView?) -> UIView {
         let label = view as? UILabel == nil ? UILabel() : view as! UILabel
         
         label.font = self.font
         label.textColor = self.textColor
         label.text = self.titleForRow(row, inComponentIndex: component)
-        label.textAlignment = .Center
+        label.textAlignment = .center
         label.textColor = self.isRowEnabled(row, forComponent: self.componentAtIndex(component)) ? self.textColor : self.disabledTextColor
 
         return label
     }
 
-    public func pickerView(pickerView: UIPickerView, widthForComponent component: Int) -> CGFloat {
+    open func pickerView(_ pickerView: UIPickerView, widthForComponent component: Int) -> CGFloat {
         return pickerView.bounds.width / 3
     }
 
 
     // MARK: UIPickerViewDataSource
-    public func pickerView(pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+    open func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
         return self.maximumNumberOfRows
     }
 
-    public func numberOfComponentsInPickerView(pickerView: UIPickerView) -> Int {
+    open func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 3
     }
 }
